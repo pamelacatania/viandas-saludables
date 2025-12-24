@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mamma che fame!!!</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body{
+  margin:0;
+  background:#f4f4f4;
+  color:#333;
+}
+
+/* HEADER */
+header{
+  background:white;
+  padding:14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 2px 6px rgba(0,0,0,.15);
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+header h1{
+  margin:0;
+  font-size:20px;
+  color:#2e7d32;
+}
+
+/* HERO */
+.hero{
+  height:160px;
+  background-image:url("https://images.unsplash.com/photo-1504674900247-0877df9cc836");
+  background-size:cover;
+  background-position:center;
+  position:relative;
+}
+.hero-box{
+  position:absolute;
+  bottom:12px;
+  left:12px;
+  background:white;
+  padding:10px 12px;
+  border-radius:12px;
+  font-size:13px;
+  box-shadow:0 4px 10px rgba(0,0,0,.25);
+}
+
+/* FILTROS */
+.filters{
+  display:flex;
+  gap:8px;
+  padding:12px;
+  overflow-x:auto;
+}
+.filters button{
+  border:none;
+  padding:8px 14px;
+  border-radius:20px;
+  background:white;
+  font-size:13px;
+  cursor:pointer;
+  box-shadow:0 2px 6px rgba(0,0,0,.15);
+}
+.filters button.active{
+  background:#2e7d32;
+  color:white;
+}
+
+/* LISTA */
+.products{
+  padding:12px;
+  padding-bottom:130px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+/* CARD TIPO PEDIDOSYA */
+.card{
+  background:white;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 4px 10px rgba(0,0,0,.12);
+}
+
+/* 🔥 IMAGEN CHICA Y PRO */
+.card img{
+  width:100%;
+  height:110px;
+  object-fit:cover;
+}
+
+/* CONTENIDO */
+.card-content{
+  padding:10px;
+}
+
+.card h3{
+  margin:0;
+  font-size:15px;
+}
+
+.card p{
+  margin:4px 0;
+  font-size:13px;
+  color:#666;
+}
+
+.card-footer{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:8px;
+}
+
+.price{
+  font-weight:bold;
+  font-size:14px;
+}
+
+.card button{
+  background:#2e7d32;
+  color:white;
+  border:none;
+  padding:6px 12px;
+  border-radius:10px;
+  font-size:13px;
+  cursor:pointer;
+}
+
+/* CARRITO */
+.cart{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background:white;
+  padding:12px;
+  box-shadow:0 -3px 10px rgba(0,0,0,.25);
+}
+
+.cart-top{
+  display:flex;
+  justify-content:space-between;
+  font-weight:bold;
+  font-size:15px;
+}
+
+.cart button{
+  width:100%;
+  margin-top:10px;
+  background:#25d366;
+  color:white;
+  border:none;
+  padding:14px;
+  border-radius:12px;
+  font-size:16px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Mamma che fame!!!</h1>
+  <span>📍 Mataderos</span>
+</header>
+
+<div class="hero">
+  <div class="hero-box">
+    <strong>Comida casera</strong><br>
+    Hecha con amor como la de mamá
+  </div>
+</div>
+
+<div class="filters">
+  <button class="active" onclick="filterProducts('all',this)">Todo</button>
+  <button onclick="filterProducts('pastas',this)">Pastas</button>
+  <button onclick="filterProducts('hamburguesas',this)">Hamburguesas</button>
+  <button onclick="filterProducts('pizzas',this)">Pizzas</button>
+</div>
+
+<div class="products" id="products"></div>
+
+<div class="cart">
+  <div class="cart-top">
+    <span>Total</span>
+    <span id="total">$0</span>
+  </div>
+  <button onclick="sendWhatsApp()">Pedir por WhatsApp</button>
+</div>
+
+<script>
+const products = [
+  {
+    name:"Fideos con tuco",
+    price:3200,
+    category:"pastas",
+    img:"https://images.unsplash.com/photo-1603133872878-684f208fb84b"
+  },
+  {
+    name:"Hamburguesa completa",
+    price:3800,
+    category:"hamburguesas",
+    img:"https://images.unsplash.com/photo-1550547660-d9450f859349"
+  },
+  {
+    name:"Pizza muzzarella",
+    price:4500,
+    category:"pizzas",
+    img:"https://images.unsplash.com/photo-1594007654729-407eedc4be65"
+  }
+];
+
+let cart = [];
+let currentFilter = "all";
+
+function renderProducts(){
+  const container = document.getElementById("products");
+  container.innerHTML = "";
+
+  products
+    .filter(p => currentFilter==="all" || p.category===currentFilter)
+    .forEach(p => {
+      container.innerHTML += `
+        <div class="card">
+          <img src="${p.img}">
+          <div class="card-content">
+            <h3>${p.name}</h3>
+            <p>Porción abundante</p>
+            <div class="card-footer">
+              <span class="price">$${p.price}</span>
+              <button onclick="addToCart('${p.name}',${p.price})">Agregar</button>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+}
+
+function filterProducts(cat,btn){
+  currentFilter = cat;
+  document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  renderProducts();
+}
+
+function addToCart(name,price){
+  cart.push({name,price});
+  updateTotal();
+}
+
+function updateTotal(){
+  const total = cart.reduce((sum,i)=>sum+i.price,0);
+  document.getElementById("total").innerText = "$"+total;
+}
+
+function sendWhatsApp(){
+  if(cart.length===0){
+    alert("El carrito está vacío");
+    return;
+  }
+
+  let msg="Hola! Quiero pedir:\n";
+  cart.forEach(i=>msg+=`- ${i.name} ($${i.price})\n`);
+  msg+=`\nTotal: $${cart.reduce((s,i)=>s+i.price,0)}`;
+
+  window.open(
+    "https://wa.me/5491111111111?text="+encodeURIComponent(msg),
+    "_blank"
+  );
+}
+
+renderProducts();
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
